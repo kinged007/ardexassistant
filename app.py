@@ -200,6 +200,7 @@ def generate_answer(query, index):
 
     """
     
+  """
     CUSTOM_QUESTION_PROMPT = PromptTemplate.from_template(template)
 
     model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.3)
@@ -214,7 +215,7 @@ def generate_answer(query, index):
     )
 
     print(qa({"question":query}))
-
+"""
     prompt = ChatPromptTemplate.from_template(template)
     chain = prompt | model
 
