@@ -206,7 +206,7 @@ st.markdown("<h1 style='text-align:center;'>ARDEX AI Assistant</h1>", unsafe_all
 
 def main():
     url = "https://ardexaustralia.com/"
-    query = st.text_input("What is your question?")
+    query = st.text_input("How may I assist you?")
     markdown = get_markdown_from_url(url)
     index = create_index_from_text(markdown)
     answer = generate_answer(query, index)
