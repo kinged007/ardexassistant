@@ -206,7 +206,7 @@ with col1:
 
 with col2:
     st.image("https://ardex.co.uk/wp-content/uploads/ardex-logo.png", width=380)
-    st.title("ARDEX AI Assistant")st.image("https://static.streamlit.io/examples/dog.jpg")
+    st.title("ARDEX AI Assistant")
 
 with col3:
     st.write(' ')
