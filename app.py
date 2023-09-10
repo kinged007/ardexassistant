@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 import requests
 import json
 import os
@@ -14,7 +14,7 @@ from llama_index import VectorStoreIndex
 import streamlit as st
 import openai
 
-load_dotenv()
+#load_dotenv()
 brwoserless_api_key = os.getenv("BROWSERLESS_API_KEY")
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
