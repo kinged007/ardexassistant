@@ -11,8 +11,11 @@ from llama_index.node_parser import SimpleNodeParser
 from llama_index.text_splitter import TokenTextSplitter
 from langchain.prompts import ChatPromptTemplate
 from llama_index import VectorStoreIndex
+from embedchain import App
 import streamlit as st
 import openai
+
+chatbot = App()
 
 #load_dotenv()
 brwoserless_api_key = os.getenv("BROWSERLESS_API_KEY")
@@ -161,6 +164,8 @@ def generate_answer(query, index):
     texts = [node.node.text for node in nodes]
 
     print("Retrieved texts!", texts)
+
+    chatbot.add(docs);
 
     # Generate answer with OpenAI
     model = ChatOpenAI(model_name="gpt-3.5-turbo-16k-0613")
