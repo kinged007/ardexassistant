@@ -187,9 +187,11 @@ def generate_answer(query, index):
     DO NOT MAKE ANYTHING UP!
     DO NOT RESPOND AS IF YOU ARE GIVEN A CONTEXT, YOU ARE TO RESPOND AS HUMAN LIKE AS POSSIBLE.
     IF YOUR RESPONSE WOULD INCLUDE "Based on the context, provided..". DO NOT SAY. ACT LIKE A HUMAN THAT IS KNOWLEDGEABLE ABOUT EVERYTHING ARDEX.
+    ALWAYS OFFER RECOMMENDATIONS AND RESPOND WITH A FOLLOW UP QUESTION.
 
     QUESTION: {query}
     ANSWER (formatted in Markdown):
+    FOLLOW UP QUESTION
     """
     prompt = ChatPromptTemplate.from_template(template)
     chain = prompt | model
