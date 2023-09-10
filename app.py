@@ -199,17 +199,8 @@ def generate_answer(query, index):
 
 # Setup Sttreamlit page layout
 st.set_page_config(layout="wide")
-col1, col2, col3 = st.columns(3)
 
-with col1:
-    st.write(' ')
-
-with col2:
-    st.image("https://ardex.co.uk/wp-content/uploads/ardex-logo.png", width=380)
-
-with col3:
-    st.write(' ')
-
+st.markdown("<div style='text-align:center;'> <img style='width:380px;' src='https://ardex.co.uk/wp-content/uploads/ardex-logo.png' /></div>", unsafe_allow_html=True)
 st.markdown("<h1 style='text-align:center;'>ARDEX AI Assistant</h1>", unsafe_allow_html=True)
 
 
