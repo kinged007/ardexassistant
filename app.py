@@ -206,10 +206,12 @@ with col1:
 
 with col2:
     st.image("https://ardex.co.uk/wp-content/uploads/ardex-logo.png", width=380)
-    st.title("ARDEX AI Assistant")
 
 with col3:
     st.write(' ')
+
+st.markdown("<h1 style='text-align:center;'>ARDEX AI Assistant</h1>")
+
 
 def main():
     url = "https://ardexaustralia.com/"
