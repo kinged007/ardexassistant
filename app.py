@@ -197,7 +197,7 @@ def generate_answer(query, index):
 
 # Setup Sttreamlit page layout
 st.set_page_config(layout="wide")
-st.title("ARDEX Chatbot")
+st.title("ARDEX AI Assistant")
 
 def main():
     url = "https://ardexaustralia.com/"
