@@ -210,7 +210,7 @@ with col2:
 with col3:
     st.write(' ')
 
-st.markdown("<h1 style='text-align:center;'>ARDEX AI Assistant</h1>")
+st.markdown("<h1 style='text-align:center;'>ARDEX AI Assistant</h1>", unsafe_allow_html=True)
 
 
 def main():
