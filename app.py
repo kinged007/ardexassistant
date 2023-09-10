@@ -190,7 +190,7 @@ def generate_answer(query, index):
     
     QUESTION: {query}
     ANSWER (formatted in Markdown):
-    FOLLOW UP QUESTION
+
     """
     prompt = ChatPromptTemplate.from_template(template)
     chain = prompt | model
