@@ -193,7 +193,7 @@ st.set_page_config(layout="wide")
 st.title("ARDEX Chatbot")
 
 def main():
-    url = "https://ardrexaustrilia.com"
+    url = "https://ardexaustralia.com/"
     query = st.text_input("What is your question?")
     markdown = get_markdown_from_url(url)
     index = create_index_from_text(markdown)
