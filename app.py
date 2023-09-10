@@ -199,6 +199,7 @@ def generate_answer(query, index):
 
 # Setup Sttreamlit page layout
 st.set_page_config(layout="wide")
+st.image("https://ardex.co.uk/wp-content/uploads/ardex-logo.png", width=400)
 st.title("ARDEX AI Assistant")
 
 def main():
