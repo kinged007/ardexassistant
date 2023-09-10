@@ -181,7 +181,7 @@ def generate_answer(query, index):
     5. If there are relevant images, video, links, they are very important reference data, please include them as part of the answer
     6. If suitable to the answer, provide any recommendations to products.
     7. If suitable to the answer, provide recommendations for training sessions provided by ARDEX.
-
+    8. Place all media such as images on a separate line.
     Use your judgement, If you think you can provide a more refined answer if you had more information from the USER, please ask any follow up questions to provide a more refined answer to the question
 
     DO NOT MAKE ANYTHING UP!
