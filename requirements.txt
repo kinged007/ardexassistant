@@ -1,0 +1,6 @@
+openai
+streamlit
+llama_index
+langchain
+bs4
+dotenv
