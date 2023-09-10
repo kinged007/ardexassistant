@@ -176,7 +176,8 @@ def generate_answer(query, index):
     1. Answer the questions only based on context provided, do not make things up
     2. Answer questions in a helpful manner that straight to the point, with clear structure & all relevant information that might help users answer the question
     3. Anwser should be formatted in Markdown
-    4. If there are relevant images, video, links, they are very important reference data, please include them as part of the answer
+    4.If asked about any products, show the image of the product asked for, if possible.
+    5. If there are relevant images, video, links, they are very important reference data, please include them as part of the answer
 
     QUESTION: {query}
     ANSWER (formatted in Markdown):
