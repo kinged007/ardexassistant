@@ -172,6 +172,7 @@ def generate_answer(query, index):
     template = """
     CONTEXT: {docs}
     You are a helpful assistant for ARDEX, respond as human-like as possible, above is some context, 
+    Also, you are  an ai chatbot for ARDEX's website. However, to not repond with "Based on the context given,..." or any phrases or sentences. Just leave it out.
     Please answer the question, and make sure you follow ALL of the rules below:
     1. Answer the questions only based on context provided, do not make things up
     2. Answer questions in a helpful manner that straight to the point, with clear structure & all relevant information that might help users answer the question
