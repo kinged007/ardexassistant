@@ -1,7 +1,8 @@
 html2text
-embedchain
 openai
 streamlit
 llama_index
 langchain
 bs4
+nltk
+
