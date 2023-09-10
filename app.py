@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+Xfrom bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 #from dotenv import load_dotenv
 import requests
@@ -11,6 +11,7 @@ from llama_index.node_parser import SimpleNodeParser
 from llama_index.text_splitter import TokenTextSplitter
 from langchain.prompts import ChatPromptTemplate
 from llama_index import VectorStoreIndex
+from langchain.memory import ConversationBufferMemory
 #from embedchain import App
 import streamlit as st
 import openai
@@ -202,7 +203,7 @@ def generate_answer(query, index):
 # Setup Sttreamlit page layout
 st.set_page_config(layout="wide")
 
-st.markdown("<div style='text-align:center;'> <img style='width:380px;' src='https://ardex.co.uk/wp-content/uploads/ardex-logo.png' /></div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align:center;'> <img style='width:340px;' src='https://ardex.co.uk/wp-content/uploads/ardex-logo.png' /></div>", unsafe_allow_html=True)
 st.markdown("<h1 style='text-align:center;'>ARDEX AI Assistant</h1>", unsafe_allow_html=True)
 
 
