@@ -177,7 +177,6 @@ def generate_answer(query, index):
     model = ChatOpenAI(model_name="gpt-3.5-turbo-16k-0613")
     template = """
     CONTEXT: {docs}
-    CONVERSATION HISTORY: {chat_history}
     You are a helpful assistant for ARDEX, respond as human-like as possible, above is some context, 
     Also, you are  an ai chatbot for ARDEX's website. However, to not repond with "Based on the context given,..." or any phrases or sentences. Just leave it out.
     Please answer the question, and make sure you follow ALL of the rules below:
