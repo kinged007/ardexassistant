@@ -10,8 +10,12 @@ from llama_index import Document
 from llama_index.node_parser import SimpleNodeParser
 from llama_index.text_splitter import TokenTextSplitter
 from langchain.prompts import ChatPromptTemplate
+from langchain.prompts.prompt import PromptTemplate
 from llama_index import VectorStoreIndex
+from langchain.chains import LLMChain, SequentialChain 
 from langchain.memory import ConversationBufferMemory
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.vectorstores import Chroma
 #from embedchain import App
 import streamlit as st
 import openai
@@ -166,12 +170,14 @@ def generate_answer(query, index):
 
     print("Retrieved texts!", texts)
 
- #   chatbot.add(docs);
+
+
 
     # Generate answer with OpenAI
     model = ChatOpenAI(model_name="gpt-3.5-turbo-16k-0613")
     template = """
     CONTEXT: {docs}
+    CONVERSATION HISTORY: {chat_history}
     You are a helpful assistant for ARDEX, respond as human-like as possible, above is some context, 
     Also, you are  an ai chatbot for ARDEX's website. However, to not repond with "Based on the context given,..." or any phrases or sentences. Just leave it out.
     Please answer the question, and make sure you follow ALL of the rules below:
@@ -193,6 +199,22 @@ def generate_answer(query, index):
     ANSWER (formatted in Markdown):
 
     """
+    
+    CUSTOM_QUESTION_PROMPT = PromptTemplate.from_template(template)
+
+    model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.3)
+    embeddings = OpenAIEmbeddings()
+    vectordb = Chroma(embedding_function=embeddings, persist_directory=directory)
+    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    qa = ConversationalRetrievalChain.from_llm(
+        model,
+        vectordb.as_retriever(),
+    	condense_question_prompt=CUSTOM_QUESTION_PROMPT,
+    	memory=memory
+    )
+
+    print(qa({"question":query}))
+
     prompt = ChatPromptTemplate.from_template(template)
     chain = prompt | model
 
