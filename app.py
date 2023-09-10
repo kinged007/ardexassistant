@@ -171,7 +171,7 @@ def generate_answer(query, index):
     model = ChatOpenAI(model_name="gpt-3.5-turbo-16k-0613")
     template = """
     CONTEXT: {docs}
-    You are a helpful assistant for ARDEX, above is some context, 
+    You are a helpful assistant for ARDEX, respond as human-like as possible, above is some context, 
     Please answer the question, and make sure you follow ALL of the rules below:
     1. Answer the questions only based on context provided, do not make things up
     2. Answer questions in a helpful manner that straight to the point, with clear structure & all relevant information that might help users answer the question
@@ -184,6 +184,7 @@ def generate_answer(query, index):
     Use your judgement, If you think you can provide a more refined answer if you had more information from the USER, please ask any follow up questions to provide a more refined answer to the question
 
     DO NOT MAKE ANYTHING UP!
+    DO NOT RESPOND AS IF YOU ARE GIVEN A CONTEXT, YOU ARE TO RESPOND AS HUMAN LIKE AS POSSIBLE.
 
     QUESTION: {query}
     ANSWER (formatted in Markdown):
