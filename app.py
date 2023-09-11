@@ -188,6 +188,7 @@ def generate_answer(query, index):
     6. If suitable to the answer, provide any recommendations to products.
     7. If suitable to the answer, provide recommendations for training sessions provided by ARDEX.
     8. Place all media such as images on a separate line.
+    9. Show the images, DO NOT PROVIDE A LINK TO THE IMAGE.
     Use your judgement, If you think you can provide a more refined answer if you had more information from the USER, please ask any follow up questions to provide a more refined answer to the question
 
     DO NOT MAKE ANYTHING UP!
