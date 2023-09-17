@@ -1,31 +1,24 @@
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin, urlparse
-#from dotenv import load_dotenv
 import requests
 import json
 import os
 import html2text
-from langchain.chat_models import ChatOpenAI
+
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urlparse
+
 from llama_index import Document
+from llama_index import VectorStoreIndex
 from llama_index.node_parser import SimpleNodeParser
 from llama_index.text_splitter import TokenTextSplitter
-from langchain.prompts import ChatPromptTemplate
-from langchain.prompts.prompt import PromptTemplate
-from llama_index import VectorStoreIndex
-from langchain.chains import LLMChain, SequentialChain 
+
+from langchain.chains import LLMChain
+from langchain.llms import OpenAI
 from langchain.memory import ConversationBufferMemory
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.vectorstores import Chroma
-#from embedchain import App
+from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
+from langchain.prompts import PromptTemplate
 import streamlit as st
-import openai
 
-#chatbot = App()
-
-#load_dotenv()
-brwoserless_api_key = os.getenv("BROWSERLESS_API_KEY")
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
+browserless_api_key = os.getenv("BROWSERLESS_API_KEY")
 
 # 1. Scrape raw HTML
 
@@ -51,7 +44,7 @@ def scrape_website(url: str):
 
     # Send the POST request
     response = requests.post(
-        f"https://chrome.browserless.io/scrape?token={brwoserless_api_key}",
+        f"https://chrome.browserless.io/scrape?token={browserless_api_key}",
         headers=headers,
         data=data_json
     )
@@ -85,9 +78,6 @@ def convert_html_to_markdown(html):
     markdown = converter.handle(html)
 
     return markdown
-
-
-# Turn https://developers.webflow.com/docs/getting-started-with-apps to https://developers.webflow.com
 
 def get_base_url(url):
     parsed_url = urlparse(url)
@@ -158,84 +148,95 @@ def create_index_from_text(markdown):
     return index
 
 
-# 4. Retrieval Augmented Generation (RAG)
 
+def main():
 
-def generate_answer(query, index):
+    st.markdown("<div style='text-align:center;'> <img style='width:340px;' src='https://ardex.co.uk/wp-content/uploads/ardex-logo.png' /></div>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center;'>ARDEX AI Assistant</h1>", unsafe_allow_html=True)
 
+    st.markdown("<p style='text-align:center;'>Welcome to ARDEX AI Assistant! Please feel free to ask any question.</p>", unsafe_allow_html=True)
+
+    # Set up memory
+    msgs = StreamlitChatMessageHistory(key="langchain_messages")
+    memory = ConversationBufferMemory(chat_memory=msgs)
+    if len(msgs.messages) == 0:
+        msgs.add_ai_message("How can I help you?")
+
+    openai_api_key = os.getenv("OPENAI_API_KEY")
+    
+    # Set up the LLMChain, passing in memory
+    
+    url = "https://ardexaustralia.com/"
+    query = "ARDEX"
+    markdown = get_markdown_from_url(url)
+    index = create_index_from_text(markdown)
+        
     # Get relevant data with similarity search
     retriever = index.as_retriever()
     nodes = retriever.retrieve(query)
     texts = [node.node.text for node in nodes]
-
-    print("Retrieved texts!", texts)
-
-
-
-
-    # Generate answer with OpenAI
-    model = ChatOpenAI(model_name="gpt-3.5-turbo-16k-0613")
-    template = """
-    CONTEXT: {docs}
-    You are a helpful assistant for ARDEX, respond as human-like as possible, above is some context, 
-    Also, you are  an ai chatbot for ARDEX's website. However, to not repond with "Based on the context given,..." or any phrases or sentences. Just leave it out.
-    Please answer the question, and make sure you follow ALL of the rules below:
-    1. Answer the questions only based on context provided, do not make things up
-    2. Answer questions in a helpful manner that straight to the point, with clear structure & all relevant information that might help users answer the question
-    3. Anwser should be formatted in Markdown
-    4. If asked about any products, show the image of the product asked for, if possible.
-    5. If there are relevant images, video, links, they are very important reference data, please include them as part of the answer
-    6. If suitable to the answer, provide any recommendations to products.
-    7. If suitable to the answer, provide recommendations for training sessions provided by ARDEX.
-    8. Place all media such as images on a separate line.
-    9. Show the images, DO NOT PROVIDE A LINK TO THE IMAGE.
-    Use your judgement, If you think you can provide a more refined answer if you had more information from the USER, please ask any follow up questions to provide a more refined answer to the question
-
-    DO NOT MAKE ANYTHING UP!
-    DO NOT RESPOND AS IF YOU ARE GIVEN A CONTEXT, YOU ARE TO RESPOND AS HUMAN LIKE AS POSSIBLE.
-    IF YOUR RESPONSE WOULD INCLUDE "Based on the context, provided..". DO NOT SAY. ACT LIKE A HUMAN THAT IS KNOWLEDGEABLE ABOUT EVERYTHING ARDEX.
     
-    QUESTION: {query}
-    ANSWER (formatted in Markdown):
+    docs = ' '.join(texts)
+    
+    template = "Context: "
+    
+    template += docs
+    
+    template += """You are an AI chatbot for ARDEX having a conversation with a human. 
+    Please follow the following instructions:
+       
+    - BEFORE ANSWERING THE QUESTION, ASK A FOLLOW UP QUESTION.
+    
+    - USE THE CONTEXT PROVIDED TO ANSWER THE USER QUESTION, and PROVIDE ANY IMAGES ASSOCIATED OR RELATED TO THE ANSWER PROVIDED WHENEVER POSSIBLE. DO NOT MAKE ANYTHING UP.
+    
+    - IF RELEVANT, BREAK YOUR ANSWER DO INTO STEPS
+    
+    - If asked about any products, show the image of the product asked for, if possible.
+    
+    - If there are relevant images, video, links, they are very important reference data, please include them as part of the answer
+    
+    - If suitable to the answer, provide any recommendations to products.
+    
+    - If suitable to the answer, provide recommendations for training sessions provided by ARDEX.
+    
+    - FORMAT YOUR ANSWER IN MARKDOWN
+    
+    - ALWAYS ASK FOLLOW UP QUESTIONS!
+    
+    Please consider the follow:
+    A common question is what the best way is to tile a swimming pool. Now while this may sound like a straightforward question, there are a lot of considerations depending on the type of application or the type of pool.
 
-    """
-    cut =  """
-    CUSTOM_QUESTION_PROMPT = PromptTemplate.from_template(template)
+     
 
-    model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0.3)
-    embeddings = OpenAIEmbeddings()
-    vectordb = Chroma(embedding_function=embeddings, persist_directory=directory)
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-    qa = ConversationalRetrievalChain.from_llm(
-        model,
-        vectordb.as_retriever(),
-    	condense_question_prompt=CUSTOM_QUESTION_PROMPT,
-    	memory=memory
-    )
+    Some of the considerations and what the bot ideally should ask are some of the following questions:
 
-    print(qa({"question":query}))
-    """
-    prompt = ChatPromptTemplate.from_template(template)
-    chain = prompt | model
+     
 
-    response = chain.invoke({"docs": texts, "query": query})
+    What type of pool is it?
+    I. e. concrete, fibreglass, shotcrete, etc?
+    Is it going to be freshwater or saltwater?
+    What type of tile is going to be used?
+     
 
-    return response.content
-
-# Setup Sttreamlit page layout
-st.set_page_config(layout="wide")
-
-st.markdown("<div style='text-align:center;'> <img style='width:340px;' src='https://ardex.co.uk/wp-content/uploads/ardex-logo.png' /></div>", unsafe_allow_html=True)
-st.markdown("<h1 style='text-align:center;'>ARDEX AI Assistant</h1>", unsafe_allow_html=True)
+    Depending on the above, it can be any number of products used and different types of applications that need to be considered. Below are some links to the type of documentation that we have:
 
 
-def main():
-    url = "https://ardexaustralia.com/"
-    query = st.text_input("How may I assist you?")
-    markdown = get_markdown_from_url(url)
-    index = create_index_from_text(markdown)
-    answer = generate_answer(query, index)
-    st.markdown(answer)
+    {history}
+    Human: {human_input}
+    AI: """
+    prompt = PromptTemplate(input_variables=["history", "human_input"], template=template)
+    llm_chain = LLMChain(llm=OpenAI(openai_api_key=openai_api_key), prompt=prompt, memory=memory)
 
+    # Render current messages from StreamlitChatMessageHistory
+    for msg in msgs.messages:
+        st.chat_message(msg.type).write(msg.content)
+
+    # If user inputs a new prompt, generate and draw a new response
+    if prompt := st.chat_input():
+        st.chat_message("human").write(prompt)
+        # Note: new messages are saved to history automatically by Langchain during run
+        response = llm_chain.run(prompt)
+        st.chat_message("ai").write(response)
+    
 if __name__ == "__main__":
     main()
