@@ -205,7 +205,7 @@ def main():
 
     - SHOW RELEVANT IMAGES OF PRODUCTS
 
-    Please consider the follow:
+    Please consider the following guidelines:
     A common question is what the best way is to tile a swimming pool. Now while this may sound like a straightforward question, there are a lot of considerations depending on the type of application or the type of pool.
 
      
