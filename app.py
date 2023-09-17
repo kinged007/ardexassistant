@@ -202,7 +202,9 @@ def main():
     - FORMAT YOUR ANSWER IN MARKDOWN
     
     - ALWAYS ASK FOLLOW UP QUESTIONS!
-    
+
+    - SHOW RELEVANT IMAGES OF PRODUCTS
+
     Please consider the follow:
     A common question is what the best way is to tile a swimming pool. Now while this may sound like a straightforward question, there are a lot of considerations depending on the type of application or the type of pool.
 
