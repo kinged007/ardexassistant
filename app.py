@@ -28,105 +28,114 @@ def get_pdf_text(pdf_docs):
 
 # Main function
 def main():
-    
+
+    # Set up Streamlit interface
+        
     st.markdown("<div style='text-align:center;'> <img style='width:340px;' src='https://ardex.co.uk/wp-content/uploads/ardex-logo.png' /></div>", unsafe_allow_html=True)
-    st.markdown("<h1 style='text-align:center;'>ARDEX AI Staff Assistant</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center;'>ARDEX AI Assistant</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center;'>Welcome to ARDEX AI Assistant! Please feel free to ask any question.</p>", unsafe_allow_html=True)
 
-    st.markdown("<p style='text-align:center;'>Welcome to ARDEX AI Staff Assistant! Please feel free to ask any question.</p>", unsafe_allow_html=True)
-
-    # Set up memory
+        # Set up memory
     msgs = StreamlitChatMessageHistory(key="langchain_messages")
     memory = ConversationBufferMemory(chat_memory=msgs)
-    if len(msgs.messages) == 0:
-        msgs.add_ai_message("How can I help you?")
 
-    # Set up the LLMChain, passing in memory
-    
-    if "docs_processed" not in st.session_state:
-        st.session_state.docs_processed = False
-        
-    if not st.session_state.docs_processed:
-        
+    # Check if there are no previous chat messages
+    if len(msgs.messages) == 0:
+        # Display initial message only at the very start
+        st.chat_message("ai").write("How can I help you?")  # AI's initial message
+
+    # Initialize query_input as None
+    query_input = None
+
+    # Get user input for query
+    query_input = st.chat_input("Your message")  # Unique key for query input
+
+    # Display user's query in the interface if query_input is set
+    if query_input:
+       # Process PDF documents
         docs_directory = os.path.join(os.getcwd(), 'docs')  # Use absolute path to 'docs' directory
         pdf_files = glob.glob(os.path.join(docs_directory, '*.pdf'))
-            
+
+        st.session_state.docs_processed = False  # Initialize docs_processed
+
         for pdf_file in pdf_files:
             with open(pdf_file, 'rb') as file:
                 # Perform processing on each PDF file
                 raw_text = get_pdf_text([file])
-                
-                st.session_state.pdf_text = ''.join(raw_text)
-                
-                st.session_state.docs_processed = True
-                
 
-        # REFORMAT !! #
-        ###################################
-        url = "https://www.ipenclosures.com.au/electrical-enclosures/"
-        query = "Electrical"
-        
+                st.session_state.pdf_text = ''.join(raw_text)
+
+        url = "https://ardexaustralia.com/"
+
+        # Scrap website url and retrieve markdown
         markdown = get_markdown_from_url(url)
-        
+
+        # Combine pdf_text and markdown
         all_info = st.session_state.pdf_text + markdown
-        
+
         index = create_index_from_text(all_info)
-        
-        #############################################
-        
+
         # Get relevant data with similarity search
         retriever = index.as_retriever()
-        
+
+        print(f'Query: {query_input}')
+
         # Input query into the retriever
-        nodes = retriever.retrieve(query)
-        
+        nodes = retriever.retrieve(query_input)
+
         texts = [node.node.text for node in nodes]
-        
+
         st.session_state.docs = ' '.join(texts)
-        st.session_state.docs_processed = True
-    
-    template = "Context: "
-    
-    template += st.session_state.docs
-    
-    template += """You are an AI staff training assistant for ARDEX having a conversation with a human. Your purpose is to train staff members on ARDEX and the products they offer so they may relay the correct information.
-    
 
-    Please follow the following instructions:
-     
-    - Assist the staff on how to use the ARDEX products and tell the user what the product is best for.
-     
-    - Make appropriate suggestions on ARDEX products to use for the any relatable query the user may make.
-       
-    - BEFORE ANSWERING THE QUESTION, ASK A FOLLOW UP QUESTION.
-    
-    - USE THE CONTEXT PROVIDED TO ANSWER THE USER QUESTION. DO NOT MAKE ANYTHING UP.
-    
-    - IF RELEVANT, BREAK YOUR ANSWER DO INTO STEPS
-    
-    - If suitable to the answer, provide any recommendations to products.
-    
-    - FORMAT YOUR ANSWER IN MARKDOWN
-    
-    - ALWAYS ASK FOLLOW UP QUESTIONS!
+        # Check if a query is provided before generating a prompt
+        if query_input:
+            template = "Context: "
+            template += st.session_state.docs
+            template += """You are an AI staff training assistant for ARDEX having a conversation with a human. Your purpose is to train staff members on ARDEX and the products they offer so they may relay the correct information.
+            
 
-    - SHOW RELEVANT IMAGES OF PRODUCTS
+            Please follow the following instructions:
+             
+            - Assist the staff on how to use the ARDEX products and tell the user what the product is best for.
+             
+            - Make appropriate suggestions on ARDEX products to use for the any relatable query the user may make.
+               
+            - BEFORE ANSWERING THE QUESTION, ASK A FOLLOW UP QUESTION.
+            
+            - USE THE CONTEXT PROVIDED TO ANSWER THE USER QUESTION. DO NOT MAKE ANYTHING UP.
+            
+            - IF RELEVANT, BREAK YOUR ANSWER DO INTO STEPS
+            
+            - If suitable to the answer, provide any recommendations to products.
+            
+            - FORMAT YOUR ANSWER IN MARKDOWN
+            
+            - ALWAYS ASK FOLLOW UP QUESTIONS!
 
-    {history}
-    Human: {human_input}
-    AI: """
-    prompt = PromptTemplate(input_variables=["history", "human_input"], template=template)
-    llm_chain = LLMChain(llm=OpenAI(openai_api_key=openai_api_key), prompt=prompt, memory=memory)
+            - SHOW RELEVANT IMAGES OF PRODUCTS
 
-    # Render current messages from StreamlitChatMessageHistory
-    for msg in msgs.messages:
-        st.chat_message(msg.type).write(msg.content)
+            {history}
+            Human: {human_input}
+            AI: """
 
-    # If user inputs a new prompt, generate and draw a new response
-    if prompt := st.chat_input():
-        st.chat_message("human").write(prompt)
-        # Note: new messages are saved to history automatically by Langchain during run
-        response = llm_chain.run(prompt)
-        st.chat_message("ai").write(response)
-    
-if __name__ == "__main__":
+            prompt = PromptTemplate(input_variables=["history", "human_input"], template=template)
+            llm_chain = LLMChain(llm=OpenAI(openai_api_key=openai_api_key), prompt=prompt, memory=memory)
+
+            # Render current messages from StreamlitChatMessageHistory
+            for msg in msgs.messages:
+                st.chat_message(msg.type).write(msg.content)
+
+            # If user inputs a new prompt, generate and draw a new response
+            if query_input:
+                
+                st.chat_message("human").write(query_input)
+        
+                # Note: new messages are saved to history automatically by Langchain during run
+                response = llm_chain.run(query_input)
+
+                print(f'Response: {response}')
+
+                st.chat_message("ai").write(response)
+
+if __name__ == '__main__':
     main()
