@@ -56,15 +56,18 @@ def main():
         docs_directory = os.path.join(os.getcwd(), 'docs')  # Use absolute path to 'docs' directory
         pdf_files = glob.glob(os.path.join(docs_directory, '*.pdf'))
 
-        st.session_state.docs_processed = False  # Initialize docs_processed
+        if "docs_processed" not in st.session_state:
+            st.session_state.docs_processed = False
+            
+        if not st.session_state.docs_processed:
+            for pdf_file in pdf_files:
+                with open(pdf_file, 'rb') as file:
+                    # Perform processing on each PDF file
+                    raw_text = get_pdf_text([file])
 
-        for pdf_file in pdf_files:
-            with open(pdf_file, 'rb') as file:
-                # Perform processing on each PDF file
-                raw_text = get_pdf_text([file])
-
-                st.session_state.pdf_text = ''.join(raw_text)
-
+                    st.session_state.pdf_text = ''.join(raw_text)
+                    st.session_state.docs_processed = True 
+        
         url = "https://ardexaustralia.com/"
 
         # Scrap website url and retrieve markdown
@@ -96,7 +99,7 @@ def main():
 
             Please follow the following instructions:
              
-            - Assist the staff on how to use the ARDEX products and tell the user what the product is best for.
+            - Assist the staff on how to use the ARDEX products and tell the user what the product is best for. As a staff member, it is important to understand the products and the systems that ARDEX offers. ARDEX has a wide range of products that are designed for any tiling, flooring or waterproofing application. We provide solutions for subfloor preparation, tile and natural stone installations, tile grouts, waterproofing and roofing membranes, and more. Additionally, ARDEX has an extensive suite of resources to help you. We have the ARDEX System Selector, which is a simple and easy to use solution that helps you find the right system for any job. We also have the Architectural Hub, which provides CAD detail drawings, CPD training, specification sheets, system specifications, and more. Please help them do so with your responses to their queries
              
             - Make appropriate suggestions on ARDEX products to use for the any relatable query the user may make.
                
