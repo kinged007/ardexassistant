@@ -148,7 +148,7 @@ def main():
     
                 # Hide Spinner
                 
-                st.write(response)
+                st.chat_message('ai').write(response)
 
 if __name__ == '__main__':
     main()
