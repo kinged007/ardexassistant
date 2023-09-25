@@ -5,4 +5,4 @@ llama_index
 langchain
 bs4
 nltk
-
+PyPDF2
