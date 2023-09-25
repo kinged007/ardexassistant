@@ -94,7 +94,7 @@ def main():
         if query_input:
             template = "Context: "
             template += st.session_state.docs
-            template += """You are an AI staff training assistant for ARDEX having a conversation with a human. Your purpose is to train staff members on ARDEX and the products they offer so they may relay the correct information.
+            template += """You are an AI staff training assistant for ARDEX having a conversation with a human. Your purpose is to train staff members on ARDEX and the products they offer so they may relay the correct information. Before responding, ask the most appropriate follow up question to provide the best possible solution for their query.
             
 
             Please follow the following instructions:
