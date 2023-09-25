@@ -49,10 +49,13 @@ def main():
 
     # Get user input for query
     query_input = st.chat_input("Your message")  # Unique key for query input
-
+            
     # Display user's query in the interface if query_input is set
+    
     if query_input:
-       # Process PDF documents
+        st.chat_message("human").write(query_input)
+        
+        # Process PDF documents
         docs_directory = os.path.join(os.getcwd(), 'docs')  # Use absolute path to 'docs' directory
         pdf_files = glob.glob(os.path.join(docs_directory, '*.pdf'))
 
@@ -94,7 +97,7 @@ def main():
         if query_input:
             template = "Context: "
             template += st.session_state.docs
-            template += """You are an AI staff training assistant for ARDEX having a conversation with a human. Your purpose is to train staff members on ARDEX and the products they offer so they may relay the correct information. Before responding, ask the most appropriate follow up question to provide the best possible solution for their query.
+            template += """You are an AI staff training assistant for ARDEX having a conversation with a human. Act as a trainer, so you should response in a directional like manner. Your purpose is to train staff members on ARDEX and the products they offer so they may relay the correct information. Before responding, ask the most appropriate follow up question to provide the best possible solution for their query.
             
 
             Please follow the following instructions:
@@ -131,13 +134,13 @@ def main():
             # If user inputs a new prompt, generate and draw a new response
             if query_input:
                 
-                st.chat_message("human").write(query_input)
-        
                 # Note: new messages are saved to history automatically by Langchain during run
                 response = llm_chain.run(query_input)
 
                 print(f'Response: {response}')
-
+    
+                # Hide Spinner
+                
                 st.chat_message("ai").write(response)
 
 if __name__ == '__main__':
